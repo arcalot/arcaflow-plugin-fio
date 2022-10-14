@@ -4,7 +4,7 @@ on:
     branches:
       - main
 env:
-  IMAGE_NAME: arcaflow-plugin-smallfile
+  IMAGE_NAME: arcaflow-plugin-fio
   IMAGE_TAG: 'latest'
   GITHUB_USERNAME: ${{ github.actor }}
   GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
