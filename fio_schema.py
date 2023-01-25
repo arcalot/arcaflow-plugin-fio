@@ -116,14 +116,14 @@ class JobParams:
         },
     )
     readwrite: Optional[IoPattern] = field(
-        default=IoPattern.read.value,
+        default=IoPattern.read,
         metadata={
             "name": "Read/Write",
             "description": "type of IO pattern",
         },
     )
     rate_process: Optional[RateProcess] = field(
-        default=RateProcess.linear.value,
+        default=RateProcess.linear,
         metadata={
             "name": "Rate Process",
             "description": (
