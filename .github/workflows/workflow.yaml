@@ -20,8 +20,9 @@ jobs:
   docsgen:
     needs: act
     uses: arcalot/arcaflow-docsgen/.github/workflows/reusable_workflow.yaml@main
-    permissions: write-all
-      #contents: read
-      #pull-requests: write
+    #permissions: write-all
+    permissions:
+      contents: write
+      pull-requests: write
     with:
       plugin_path: "fio_plugin.py"
