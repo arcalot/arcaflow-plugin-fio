@@ -5,18 +5,18 @@ import json
 import sys
 import yaml
 from pathlib import Path
-
+import fio_plugin
+import fio_schema
 from arcaflow_plugin_sdk import plugin
-import arcaflow_plugin_fio.fio_plugin as fio_plugin
-import arcaflow_plugin_fio.fio_schema as fio_schema
 
 
-with open("fixtures/poisson-rate-submission_output-plus.json", "r") as fout:
+
+with open("../fixtures/poisson-rate-submission_output-plus.json", "r") as fout:
     poisson_submit_outfile = fout.read()
 
 poisson_submit_output = json.loads(poisson_submit_outfile)
 
-with open("fixtures/poisson-rate-submission_input.yaml", "r") as fin:
+with open("../fixtures/poisson-rate-submission_input.yaml", "r") as fin:
     poisson_submit_infile = fin.read()
 
 poisson_submit_input = fio_schema.fio_input_schema.unserialize(
