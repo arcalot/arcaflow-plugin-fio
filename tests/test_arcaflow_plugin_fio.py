@@ -9,8 +9,6 @@ import fio_plugin
 import fio_schema
 from arcaflow_plugin_sdk import plugin
 
-
-
 with open("../fixtures/poisson-rate-submission_output-plus.json", "r") as fout:
     poisson_submit_outfile = fout.read()
 
