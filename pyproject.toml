@@ -12,7 +12,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-arcaflow-plugin-sdk = "0.10.2"
+arcaflow-plugin-sdk = "0.10.3"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
