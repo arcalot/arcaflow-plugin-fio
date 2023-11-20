@@ -99,7 +99,7 @@ run an fio workload
         </details><details><summary>ioengine (<code>enum[string]</code>)</summary>
         <table><tbody><tr><th>Name:</th><td>IO Engine</td></tr><tr><th>Description:</th><td>Defines how the job issues IO to the file.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
         <details><summary>Values</summary>
-            <ul><li><strong><code>libaio</code>:</strong> libaio</li><li><strong><code>psync</code>:</strong> psync</li><li><strong><code>sync</code>:</strong> sync</li><li><strong><code>windowsaio</code>:</strong> windowsaio</li><li><strong><code>{&#39;libaio&#39;, &#39;windowsaio&#39;}</code>:</strong> _async_io_engines</li><li><strong><code>{&#39;psync&#39;, &#39;sync&#39;}</code>:</strong> _sync_io_engines</li></ul>
+            <ul><li><strong><code>libaio</code>:</strong> libaio</li><li><strong><code>psync</code>:</strong> psync</li><li><strong><code>sync</code>:</strong> sync</li><li><strong><code>windowsaio</code>:</strong> windowsaio</li><li><strong><code>{&#39;psync&#39;, &#39;sync&#39;}</code>:</strong> _sync_io_engines</li><li><strong><code>{&#39;windowsaio&#39;, &#39;libaio&#39;}</code>:</strong> _async_io_engines</li></ul>
         </details>
     </td>
 </tr></tbody></table>
