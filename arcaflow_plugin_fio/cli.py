@@ -4,8 +4,6 @@ import arcaflow_plugin_fio.fio_plugin as fio_plugin
 
 
 def main():
-    # for key in sys.modules:
-        # print(key)
     sys.exit(plugin.run(plugin.build_schema(fio_plugin.run)))
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import typing
 import json
 import subprocess
@@ -60,3 +61,7 @@ def run(
             infile_temp_path.unlink(missing_ok=True)
             outfile_temp_path.unlink(missing_ok=True)
             Path(params.name + ".0.0").unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    sys.exit(plugin.run(plugin.build_schema(run)))
