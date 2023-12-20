@@ -9,7 +9,7 @@ from typing import Union
 from pathlib import Path
 
 from arcaflow_plugin_sdk import plugin
-from fio_schema import (
+from arcaflow_plugin_fio.fio_schema import (
     FioJob,
     FioSuccessOutput,
     FioErrorOutput,

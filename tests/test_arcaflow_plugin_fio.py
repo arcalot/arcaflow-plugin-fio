@@ -5,8 +5,8 @@ import json
 import sys
 import yaml
 from pathlib import Path
-import fio_plugin
-import fio_schema
+import arcaflow_plugin_fio.fio_plugin as fio_plugin
+import arcaflow_plugin_fio.fio_schema as fio_schema
 from arcaflow_plugin_sdk import plugin
 
 with open("../fixtures/poisson-rate-submission_output-plus.json", "r") as fout:
