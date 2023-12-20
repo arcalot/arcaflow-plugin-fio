@@ -5,11 +5,6 @@ description = ""
 authors = ["Matthew F Leader"]
 license = "Apache-2.0+GPL-2.0-only"
 
-packages = [
-   { include="fio_plugin.py", from="./arcaflow_plugin_fio"  },
-]
-
-
 [tool.poetry.dependencies]
 python = "^3.9"
 arcaflow-plugin-sdk = "^0.13.0"
