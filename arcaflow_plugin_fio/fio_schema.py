@@ -4,10 +4,10 @@ import typing
 import enum
 import configparser
 from dataclasses import dataclass, field, asdict
-from typing import Optional, Annotated, Dict
+from typing import Optional, Dict
 from pathlib import Path
 
-from arcaflow_plugin_sdk import plugin, schema, validation, annotations
+from arcaflow_plugin_sdk import plugin, schema, validation
 
 
 class IoPattern(str, enum.Enum):
@@ -79,7 +79,7 @@ class JobParams:
             "or devices. In ZBD mode, size can be given in units of number of zones "
             "using 'z'. Can be combined with offset to constrain the start and end "
             "range that I/O will be done within."
-        )
+        ),
     ] = None
     blocksize: typing.Annotated[
         typing.Optional[str],
@@ -90,7 +90,7 @@ class JobParams:
             "applies to reads, writes, and trims. Comma-separated values may be "
             "specified for reads, writes, and trims. A value not terminated in a comma "
             "applies to subsequent types."
-        )
+        ),
     ] = None
     direct: typing.Annotated[
         typing.Optional[int],
@@ -101,7 +101,7 @@ class JobParams:
             "Use non-buffered I/O. This is usually O_DIRECT. Note that OpenBSD and ZFS "
             "on Solaris don't support direct I/O. On Windows the synchronous ioengines "
             "don't support direct I/O."
-        )
+        ),
     ] = None
     numjobs: typing.Annotated[
         typing.Optional[int],
@@ -111,7 +111,7 @@ class JobParams:
             "spawned as an independent thread or process. May be used to setup a "
             "larger number of threads/processes doing the same thing. Each thread is "
             "reported separately."
-        )
+        ),
     ] = None
     runtime: typing.Annotated[
         typing.Optional[str],
@@ -121,7 +121,7 @@ class JobParams:
             "workload or until it has run for this specified amount of time, whichever "
             "occurs first. When the unit is omitted, the value is interpreted in "
             "seconds."
-        )
+        ),
     ] = None
     startdelay: typing.Annotated[
         typing.Optional[str],
@@ -130,7 +130,7 @@ class JobParams:
             "Delay the start of job for the specified amount of time. Can be a single "
             "value or a range. When given as a range, each thread will choose a value "
             "randomly from within the range. Value is in seconds if a unit is omitted."
-        )
+        ),
     ] = None
     ioengine: typing.Annotated[
         typing.Optional[IoEngine],
@@ -201,8 +201,10 @@ class FioInput:
     cleanup: typing.Annotated[
         typing.Optional[bool],
         schema.name("Cleanup"),
-        schema.description("Cleanup temporary files created during execution."),
-     ] = True
+        schema.description(
+            "Cleanup temporary files created during execution."
+        ),
+    ] = True
 
     def write_jobs_to_file(self, filepath: Path):
         cfg = configparser.ConfigParser()

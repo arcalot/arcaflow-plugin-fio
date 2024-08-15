@@ -40,7 +40,9 @@ class FioPluginTest(unittest.TestCase):
             yaml.safe_load(poisson_submit_infile)
         )
         input.cleanup = False
-        output_id, output_data = fio_plugin.run(params=input, run_id="plugin_ci")
+        output_id, output_data = fio_plugin.run(
+            params=input, run_id="plugin_ci"
+        )
 
         # if the command didn't succeed, fio-plus.json won't exist.
         try:
