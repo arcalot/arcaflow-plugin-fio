@@ -64,7 +64,7 @@ run an fio workload
 <table><tbody>
 <tr><th>Type:</th><td><code>scope</code></td><tr><th>Root object:</th><td>FioInput</td></tr>
 <tr><th>Properties</th><td><details><summary>cleanup (<code>bool</code>)</summary>
-                <table><tbody><tr><th>Name:</th><td>Cleanup</td></tr><tr><th>Description:</th><td width="500">Cleanup temporary files created during execution.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>true</code></pre></td></tr><tr><th>Type:</th><td><code>bool</code></td></tbody></table>
+                <table><tbody><tr><th>Name:</th><td>Cleanup</td></tr><tr><th>Description:</th><td width="500">Cleanup temporary files created during execution.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>false</code></pre></td></tr><tr><th>Type:</th><td><code>bool</code></td></tbody></table>
             </details><details><summary>jobs (<code>list[<code>reference[FioJob]</code>]</code>)</summary>
                 <table><tbody><tr><th>Name:</th><td>Fio Jobs List</td></tr><tr><th>Description:</th><td width="500">List of jobs for fio to run</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>list[<code>reference[FioJob]</code>]</code></td><tr><td colspan="2">
     <details>
@@ -75,7 +75,7 @@ run an fio workload
             </details></td></tr>
 <tr><td colspan="2"><details><summary><strong>Objects</strong></summary><details><summary>FioInput (<code>object</code>)</summary>
             <table><tbody><tr><th>Type:</th><td><code>object</code></td><tr><th>Properties</th><td><details><summary>cleanup (<code>bool</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>Cleanup</td></tr><tr><th>Description:</th><td width="500">Cleanup temporary files created during execution.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>true</code></pre></td></tr><tr><th>Type:</th><td><code>bool</code></td></tbody></table>
+        <table><tbody><tr><th>Name:</th><td>Cleanup</td></tr><tr><th>Description:</th><td width="500">Cleanup temporary files created during execution.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>false</code></pre></td></tr><tr><th>Type:</th><td><code>bool</code></td></tbody></table>
         </details><details><summary>jobs (<code>list[<code>reference[FioJob]</code>]</code>)</summary>
         <table><tbody><tr><th>Name:</th><td>Fio Jobs List</td></tr><tr><th>Description:</th><td width="500">List of jobs for fio to run</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>list[<code>reference[FioJob]</code>]</code></td><tr><td colspan="2">
     <details>
@@ -114,7 +114,7 @@ run an fio workload
         </details><details><summary>ioengine (<code>enum[string]</code>)</summary>
         <table><tbody><tr><th>Name:</th><td>IO Engine</td></tr><tr><th>Description:</th><td width="500">Defines how the job issues IO to the file.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
         <details><summary>Values</summary>
-            <ul><li><strong><code>libaio</code>:</strong> libaio</li><li><strong><code>psync</code>:</strong> psync</li><li><strong><code>sync</code>:</strong> sync</li><li><strong><code>windowsaio</code>:</strong> windowsaio</li><li><strong><code>{&#39;psync&#39;, &#39;sync&#39;}</code>:</strong> _sync_io_engines</li><li><strong><code>{&#39;windowsaio&#39;, &#39;libaio&#39;}</code>:</strong> _async_io_engines</li></ul>
+            <ul><li><strong><code>libaio</code>:</strong> libaio</li><li><strong><code>psync</code>:</strong> psync</li><li><strong><code>sync</code>:</strong> sync</li><li><strong><code>windowsaio</code>:</strong> windowsaio</li><li><strong><code>{&#39;sync&#39;, &#39;psync&#39;}</code>:</strong> _sync_io_engines</li><li><strong><code>{&#39;windowsaio&#39;, &#39;libaio&#39;}</code>:</strong> _async_io_engines</li></ul>
         </details>
     </td>
 </tr></tbody></table>
