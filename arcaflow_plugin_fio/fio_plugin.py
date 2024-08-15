@@ -10,7 +10,7 @@ from pathlib import Path
 
 from arcaflow_plugin_sdk import plugin
 from fio_schema import (
-    FioJob,
+    FioInput,
     FioSuccessOutput,
     FioErrorOutput,
     fio_output_schema,
@@ -24,12 +24,12 @@ from fio_schema import (
     outputs={"success": FioSuccessOutput, "error": FioErrorOutput},
 )
 def run(
-    params: FioJob,
+    params: FioInput,
 ) -> typing.Tuple[str, Union[FioSuccessOutput, FioErrorOutput]]:
     try:
         outfile_temp_path = Path("fio-plus.json")
         infile_temp_path = Path("fio-input-tmp.fio")
-        params.write_params_to_file(infile_temp_path)
+        params.write_jobs_to_file(infile_temp_path)
         cmd = [
             "fio",
             f"{infile_temp_path}",

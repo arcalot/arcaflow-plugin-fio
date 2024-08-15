@@ -7,7 +7,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional, Annotated, Dict
 from pathlib import Path
 
-from arcaflow_plugin_sdk import plugin, validation
+from arcaflow_plugin_sdk import plugin, schema, validation, annotations
 
 
 class IoPattern(str, enum.Enum):
@@ -137,8 +137,8 @@ class JobParams:
 class FioJob:
     name: Annotated[str, validation.min(1)] = field(
         metadata={
-            "name": "Name",
-            "description": "The name of the fio job.",
+            "name": "Job Name",
+            "description": "The user-defined name of the fio job.",
         }
     )
     params: JobParams = field(
@@ -147,19 +147,28 @@ class FioJob:
             "description": "Parameters to execute one fio job.",
         }
     )
-    cleanup: bool = field(
-        default=True,
-        metadata={
-            "name": "Cleanup",
-            "description": "Cleanup temporary files created during execution.",
-        },
-    )
 
-    def write_params_to_file(self, filepath: Path):
+
+@dataclass
+class FioInput:
+    jobs: typing.Annotated[
+        typing.List[FioJob],
+        schema.name("Fio Jobs List"),
+        schema.description("List of jobs for fio to run"),
+    ]
+
+    cleanup: typing.Annotated[
+        typing.Optional[bool],
+        schema.name("Cleanup"),
+        schema.description("Cleanup temporary files created during execution."),
+     ] = True
+
+    def write_jobs_to_file(self, filepath: Path):
         cfg = configparser.ConfigParser()
-        cfg[self.name] = {}
-        for key, value in asdict(self.params).items():
-            cfg[self.name][key] = str(value)
+        for job in self.jobs:
+            cfg[job.name] = {}
+            for key, value in asdict(job.params).items():
+                cfg[job.name][key] = str(value)
         with open(filepath, "w") as temp:
             cfg.write(
                 temp,
@@ -741,6 +750,6 @@ class FioSuccessOutput:
     )
 
 
-fio_input_schema = plugin.build_object_schema(FioJob)
+fio_input_schema = plugin.build_object_schema(FioInput)
 job_schema = plugin.build_object_schema(JobResult)
 fio_output_schema = plugin.build_object_schema(FioSuccessOutput)
