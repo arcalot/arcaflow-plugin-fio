@@ -58,95 +58,136 @@ class IoEngine(str, enum.Enum):
 
 @dataclass
 class JobParams:
-    size: Annotated[str, validation.min(2)] = field(
-        metadata={
-            "name": "size",
-            "description": """The total size in bytes of the file IO for """
-            """each thread of this job. If a unit other than bytes is used, """
-            """the integer is concatenated with the corresponding unit """
-            """abbreviation (i.e. 10KiB, 10MiB, 10GiB, ...).""",
-        }
-    )
-    ioengine: IoEngine = field(
-        metadata={
-            "name": "IO Engine",
-            "description": "Defines how the job issues IO to the file.",
-        }
-    )
-    iodepth: int = field(
-        metadata={
-            "name": "IO Depth",
-            "description": (
-                "number of IO units to keep in flight against the file."
-            ),
-        }
-    )
-    rate_iops: int = field(
-        metadata={
-            "name": "IOPS Cap",
-            "description": "maximum allowed rate of IO operations per second",
-        }
-    )
-    io_submit_mode: IoSubmitMode = field(
-        metadata={
-            "name": "IO Submit Mode",
-            "description": "Controls how fio submits IO to the IO engine.",
-        }
-    )
+    size: typing.Annotated[
+        typing.Optional[str],
+        validation.min(2),
+        schema.name("size"),
+        schema.description(
+            "The total size of file I/O for each thread of this job. Fio will run "
+            "until this many bytes has been transferred, unless runtime is altered by "
+            "other means such as (1) runtime, (2) io_size, (3) number_ios, (4) "
+            "gaps/holes while doing I/O's such as `rw=read:16K', or (5) sequential "
+            "I/O reaching end of the file which is possible when percentage_random is "
+            "less than 100. Fio will divide this size between the available files "
+            "determined by options such as nrfiles, filename, unless filesize is "
+            "specified by the job. If the result of division happens to be 0, the size "
+            "is set to the physical size of the given files or devices if they exist. "
+            "If this option is not specified, fio will use the full size of the given "
+            "files or devices. If the files do not exist, size must be given. It is "
+            "also  possible to give size as a percentage between 1 and 100. If "
+            "'size=20%' is given, fio will use 20% of the full size of the given files "
+            "or devices. In ZBD mode, size can be given in units of number of zones "
+            "using 'z'. Can be combined with offset to constrain the start and end "
+            "range that I/O will be done within."
+        )
+    ] = None
+    blocksize: typing.Annotated[
+        typing.Optional[str],
+        validation.min(2),
+        schema.name("Block Size"),
+        schema.description(
+            "Block size in bytes used for I/O units. Default is 4096. A single value "
+            "applies to reads, writes, and trims. Comma-separated values may be "
+            "specified for reads, writes, and trims. A value not terminated in a comma "
+            "applies to subsequent types."
+        )
+    ] = None
+    direct: typing.Annotated[
+        typing.Optional[int],
+        validation.min(0),
+        validation.max(1),
+        schema.name("Direct I/O"),
+        schema.description(
+            "Use non-buffered I/O. This is usually O_DIRECT. Note that OpenBSD and ZFS "
+            "on Solaris don't support direct I/O. On Windows the synchronous ioengines "
+            "don't support direct I/O."
+        )
+    ] = None
+    numjobs: typing.Annotated[
+        typing.Optional[int],
+        schema.name("Number of Job Clones"),
+        schema.description(
+            "Create the specified number of clones of this job. Each clone of job is "
+            "spawned as an independent thread or process. May be used to setup a "
+            "larger number of threads/processes doing the same thing. Each thread is "
+            "reported separately."
+        )
+    ] = None
+    runtime: typing.Annotated[
+        typing.Optional[str],
+        schema.name("Job Run Time"),
+        schema.description(
+            "Limit runtime. The test will run until it completes the configured I/O "
+            "workload or until it has run for this specified amount of time, whichever "
+            "occurs first. When the unit is omitted, the value is interpreted in "
+            "seconds."
+        )
+    ] = None
+    startdelay: typing.Annotated[
+        typing.Optional[str],
+        schema.name("Job Start Delay"),
+        schema.description(
+            "Delay the start of job for the specified amount of time. Can be a single "
+            "value or a range. When given as a range, each thread will choose a value "
+            "randomly from within the range. Value is in seconds if a unit is omitted."
+        )
+    ] = None
+    ioengine: typing.Annotated[
+        typing.Optional[IoEngine],
+        schema.name("IO Engine"),
+        schema.description("Defines how the job issues IO to the file."),
+    ] = None
+    iodepth: typing.Annotated[
+        typing.Optional[int],
+        schema.name("IO Depth"),
+        schema.description(
+            "number of IO units to keep in flight against the file."
+        ),
+    ] = None
+    rate_iops: typing.Annotated[
+        typing.Optional[int],
+        schema.name("IOPS Cap"),
+        schema.description("maximum allowed rate of IO operations per second"),
+    ] = None
+    io_submit_mode: typing.Annotated[
+        typing.Optional[IoSubmitMode],
+        schema.name("IO Submit Mode"),
+        schema.description("Controls how fio submits IO to the IO engine."),
+    ] = None
     buffered: typing.Annotated[
         Optional[int],
         validation.min(0),
         validation.max(1),
-    ] = field(
-        default=1,
-        metadata={
-            "name": "Buffered",
-            "description": "Use buffered IO if True, else use direct IO.",
-        },
-    )
-    atomic: typing.Annotated[
-        Optional[int],
-        validation.min(0),
-        validation.max(1),
-    ] = field(
-        default=0,
-        metadata={
-            "name": "Atomic",
-            "description": "attemp to use atomic direct IO",
-        },
-    )
-    readwrite: Optional[IoPattern] = field(
-        default=IoPattern.read,
-        metadata={
-            "name": "Read/Write",
-            "description": "type of IO pattern",
-        },
-    )
-    rate_process: Optional[RateProcess] = field(
-        default=RateProcess.linear,
-        metadata={
-            "name": "Rate Process",
-            "description": (
-                "Controls the distribution of delay between IO submissions."
-            ),
-        },
-    )
+        schema.name("Buffered"),
+        schema.description("Use buffered IO if True, else use direct IO."),
+    ] = None
+    readwrite: typing.Annotated[
+        typing.Optional[IoPattern],
+        schema.name("Read/Write"),
+        schema.description("type of IO pattern"),
+    ] = None
+    rate_process: typing.Annotated[
+        typing.Optional[RateProcess],
+        schema.name("Rate Process"),
+        schema.description(
+            "Controls the distribution of delay between IO submissions."
+        ),
+    ] = None
 
 
 @dataclass
 class FioJob:
-    name: Annotated[str, validation.min(1)] = field(
-        metadata={
-            "name": "Job Name",
-            "description": "The user-defined name of the fio job.",
-        }
-    )
-    params: JobParams = field(
-        metadata={
-            "name": "Fio Job Parameters",
-            "description": "Parameters to execute one fio job.",
-        }
-    )
+    name: typing.Annotated[
+        str,
+        validation.min(1),
+        schema.name("Job Name"),
+        schema.description("The user-defined name of the fio job."),
+    ]
+    params: typing.Annotated[
+        JobParams,
+        schema.name("Fio Job Parameters"),
+        schema.description("Parameters to execute one fio job."),
+    ]
 
 
 @dataclass
@@ -168,7 +209,8 @@ class FioInput:
         for job in self.jobs:
             cfg[job.name] = {}
             for key, value in asdict(job.params).items():
-                cfg[job.name][key] = str(value)
+                if value is not None:
+                    cfg[job.name][key] = str(value)
         with open(filepath, "w") as temp:
             cfg.write(
                 temp,
