@@ -60,7 +60,8 @@ def run(
         if params.cleanup:
             infile_temp_path.unlink(missing_ok=True)
             outfile_temp_path.unlink(missing_ok=True)
-            Path(params.name + ".0.0").unlink(missing_ok=True)
+            for job in params.jobs:
+                Path(job.name + ".0.0").unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
