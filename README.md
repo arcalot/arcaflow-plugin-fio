@@ -62,66 +62,88 @@ run an fio workload
 ### Input
 
 <table><tbody>
-<tr><th>Type:</th><td><code>scope</code></td><tr><th>Root object:</th><td>FioJob</td></tr>
+<tr><th>Type:</th><td><code>scope</code></td><tr><th>Root object:</th><td>FioInput</td></tr>
 <tr><th>Properties</th><td><details><summary>cleanup (<code>bool</code>)</summary>
                 <table><tbody><tr><th>Name:</th><td>Cleanup</td></tr><tr><th>Description:</th><td width="500">Cleanup temporary files created during execution.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>true</code></pre></td></tr><tr><th>Type:</th><td><code>bool</code></td></tbody></table>
-            </details><details><summary>name (<code>string</code>)</summary>
-                <table><tbody><tr><th>Name:</th><td>Name</td></tr><tr><th>Description:</th><td width="500">The name of the fio job.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>string</code></td><tr><th>Minimum length:</th><td>1</td></tr></tbody></table>
-            </details><details><summary>params (<code>reference[JobParams]</code>)</summary>
-                <table><tbody><tr><th>Name:</th><td>Fio Job Parameters</td></tr><tr><th>Description:</th><td width="500">Parameters to execute one fio job.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>reference[JobParams]</code></td><tr><th>Referenced object:</th><td>JobParams</td></tr></tbody></table>
+            </details><details><summary>jobs (<code>list[<code>reference[FioJob]</code>]</code>)</summary>
+                <table><tbody><tr><th>Name:</th><td>Fio Jobs List</td></tr><tr><th>Description:</th><td width="500">List of jobs for fio to run</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>list[<code>reference[FioJob]</code>]</code></td><tr><td colspan="2">
+    <details>
+        <summary>List items</summary>
+        <table><tbody><tr><th>Type:</th><td><code>reference[FioJob]</code></td><tr><th>Referenced object:</th><td>FioJob</td></tr></tbody></table>
+    </details>
+</td></tr></tbody></table>
             </details></td></tr>
-<tr><td colspan="2"><details><summary><strong>Objects</strong></summary><details><summary>FioJob (<code>object</code>)</summary>
+<tr><td colspan="2"><details><summary><strong>Objects</strong></summary><details><summary>FioInput (<code>object</code>)</summary>
             <table><tbody><tr><th>Type:</th><td><code>object</code></td><tr><th>Properties</th><td><details><summary>cleanup (<code>bool</code>)</summary>
         <table><tbody><tr><th>Name:</th><td>Cleanup</td></tr><tr><th>Description:</th><td width="500">Cleanup temporary files created during execution.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>true</code></pre></td></tr><tr><th>Type:</th><td><code>bool</code></td></tbody></table>
-        </details><details><summary>name (<code>string</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>Name</td></tr><tr><th>Description:</th><td width="500">The name of the fio job.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>string</code></td><tr><th>Minimum length:</th><td>1</td></tr></tbody></table>
+        </details><details><summary>jobs (<code>list[<code>reference[FioJob]</code>]</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Fio Jobs List</td></tr><tr><th>Description:</th><td width="500">List of jobs for fio to run</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>list[<code>reference[FioJob]</code>]</code></td><tr><td colspan="2">
+    <details>
+        <summary>List items</summary>
+        <table><tbody><tr><th>Type:</th><td><code>reference[FioJob]</code></td><tr><th>Referenced object:</th><td>FioJob</td></tr></tbody></table>
+    </details>
+</td></tr></tbody></table>
+        </details></td></tr>
+</tbody></table>
+        </details><details><summary>FioJob (<code>object</code>)</summary>
+            <table><tbody><tr><th>Type:</th><td><code>object</code></td><tr><th>Properties</th><td><details><summary>name (<code>string</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Job Name</td></tr><tr><th>Description:</th><td width="500">The user-defined name of the fio job.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>string</code></td><tr><th>Minimum length:</th><td>1</td></tr></tbody></table>
         </details><details><summary>params (<code>reference[JobParams]</code>)</summary>
         <table><tbody><tr><th>Name:</th><td>Fio Job Parameters</td></tr><tr><th>Description:</th><td width="500">Parameters to execute one fio job.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>reference[JobParams]</code></td><tr><th>Referenced object:</th><td>JobParams</td></tr></tbody></table>
         </details></td></tr>
 </tbody></table>
         </details><details><summary>JobParams (<code>object</code>)</summary>
-            <table><tbody><tr><th>Type:</th><td><code>object</code></td><tr><th>Properties</th><td><details><summary>atomic (<code>int</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>Atomic</td></tr><tr><th>Description:</th><td width="500">attemp to use atomic direct IO</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>0</code></pre></td></tr><tr><th>Type:</th><td><code>int</code></td><tr><th>Minimum:</th><td>0</td></tr><tr><th>Maximum:</th><td>1</td></tr>
-</tbody></table>
+            <table><tbody><tr><th>Type:</th><td><code>object</code></td><tr><th>Properties</th><td><details><summary>blocksize (<code>string</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Block Size</td></tr><tr><th>Description:</th><td width="500">Block size in bytes used for I/O units. Default is 4096. A single value applies to reads, writes, and trims. Comma-separated values may be specified for reads, writes, and trims. A value not terminated in a comma applies to subsequent types.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>string</code></td><tr><th>Minimum length:</th><td>2</td></tr></tbody></table>
         </details><details><summary>buffered (<code>int</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>Buffered</td></tr><tr><th>Description:</th><td width="500">Use buffered IO if True, else use direct IO.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>1</code></pre></td></tr><tr><th>Type:</th><td><code>int</code></td><tr><th>Minimum:</th><td>0</td></tr><tr><th>Maximum:</th><td>1</td></tr>
+        <table><tbody><tr><th>Name:</th><td>Buffered</td></tr><tr><th>Description:</th><td width="500">Use buffered IO if True, else use direct IO.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>int</code></td><tr><th>Minimum:</th><td>0</td></tr><tr><th>Maximum:</th><td>1</td></tr>
+</tbody></table>
+        </details><details><summary>direct (<code>int</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Direct I/O</td></tr><tr><th>Description:</th><td width="500">Use non-buffered I/O. This is usually O_DIRECT. Note that OpenBSD and ZFS on Solaris don&#39;t support direct I/O. On Windows the synchronous ioengines don&#39;t support direct I/O.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>int</code></td><tr><th>Minimum:</th><td>0</td></tr><tr><th>Maximum:</th><td>1</td></tr>
 </tbody></table>
         </details><details><summary>io_submit_mode (<code>enum[string]</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>IO Submit Mode</td></tr><tr><th>Description:</th><td width="500">Controls how fio submits IO to the IO engine.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
+        <table><tbody><tr><th>Name:</th><td>IO Submit Mode</td></tr><tr><th>Description:</th><td width="500">Controls how fio submits IO to the IO engine.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
         <details><summary>Values</summary>
             <ul><li><strong><code>inline</code>:</strong> inline</li><li><strong><code>offload</code>:</strong> offload</li></ul>
         </details>
     </td>
 </tr></tbody></table>
         </details><details><summary>iodepth (<code>int</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>IO Depth</td></tr><tr><th>Description:</th><td width="500">number of IO units to keep in flight against the file.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>int</code></td>
+        <table><tbody><tr><th>Name:</th><td>IO Depth</td></tr><tr><th>Description:</th><td width="500">number of IO units to keep in flight against the file.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>int</code></td>
 </tbody></table>
         </details><details><summary>ioengine (<code>enum[string]</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>IO Engine</td></tr><tr><th>Description:</th><td width="500">Defines how the job issues IO to the file.</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
+        <table><tbody><tr><th>Name:</th><td>IO Engine</td></tr><tr><th>Description:</th><td width="500">Defines how the job issues IO to the file.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
         <details><summary>Values</summary>
-            <ul><li><strong><code>libaio</code>:</strong> libaio</li><li><strong><code>psync</code>:</strong> psync</li><li><strong><code>sync</code>:</strong> sync</li><li><strong><code>windowsaio</code>:</strong> windowsaio</li><li><strong><code>{&#39;libaio&#39;, &#39;windowsaio&#39;}</code>:</strong> _async_io_engines</li><li><strong><code>{&#39;psync&#39;, &#39;sync&#39;}</code>:</strong> _sync_io_engines</li></ul>
+            <ul><li><strong><code>libaio</code>:</strong> libaio</li><li><strong><code>psync</code>:</strong> psync</li><li><strong><code>sync</code>:</strong> sync</li><li><strong><code>windowsaio</code>:</strong> windowsaio</li><li><strong><code>{&#39;psync&#39;, &#39;sync&#39;}</code>:</strong> _sync_io_engines</li><li><strong><code>{&#39;windowsaio&#39;, &#39;libaio&#39;}</code>:</strong> _async_io_engines</li></ul>
         </details>
     </td>
 </tr></tbody></table>
+        </details><details><summary>numjobs (<code>int</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Number of Job Clones</td></tr><tr><th>Description:</th><td width="500">Create the specified number of clones of this job. Each clone of job is spawned as an independent thread or process. May be used to setup a larger number of threads/processes doing the same thing. Each thread is reported separately.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>int</code></td>
+</tbody></table>
         </details><details><summary>rate_iops (<code>int</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>IOPS Cap</td></tr><tr><th>Description:</th><td width="500">maximum allowed rate of IO operations per second</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>int</code></td>
+        <table><tbody><tr><th>Name:</th><td>IOPS Cap</td></tr><tr><th>Description:</th><td width="500">maximum allowed rate of IO operations per second</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>int</code></td>
 </tbody></table>
         </details><details><summary>rate_process (<code>enum[string]</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>Rate Process</td></tr><tr><th>Description:</th><td width="500">Controls the distribution of delay between IO submissions.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>&#34;linear&#34;</code></pre></td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
+        <table><tbody><tr><th>Name:</th><td>Rate Process</td></tr><tr><th>Description:</th><td width="500">Controls the distribution of delay between IO submissions.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
         <details><summary>Values</summary>
             <ul><li><strong><code>linear</code>:</strong> linear</li><li><strong><code>poisson</code>:</strong> poisson</li></ul>
         </details>
     </td>
 </tr></tbody></table>
         </details><details><summary>readwrite (<code>enum[string]</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>Read/Write</td></tr><tr><th>Description:</th><td width="500">type of IO pattern</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Default (JSON encoded):</th><td><pre><code>&#34;read&#34;</code></pre></td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
+        <table><tbody><tr><th>Name:</th><td>Read/Write</td></tr><tr><th>Description:</th><td width="500">type of IO pattern</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>enum[string]</code></td><tr><td colspan="2">
         <details><summary>Values</summary>
             <ul><li><strong><code>randread</code>:</strong> randread</li><li><strong><code>randrw</code>:</strong> randrw</li><li><strong><code>randwrite</code>:</strong> randwrite</li><li><strong><code>read</code>:</strong> read</li><li><strong><code>readwrite</code>:</strong> readwrite</li><li><strong><code>rw</code>:</strong> rw</li><li><strong><code>write</code>:</strong> write</li></ul>
         </details>
     </td>
 </tr></tbody></table>
+        </details><details><summary>runtime (<code>string</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Job Run Time</td></tr><tr><th>Description:</th><td width="500">Limit runtime. The test will run until it completes the configured I/O workload or until it has run for this specified amount of time, whichever occurs first. When the unit is omitted, the value is interpreted in seconds.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>string</code></td></tbody></table>
         </details><details><summary>size (<code>string</code>)</summary>
-        <table><tbody><tr><th>Name:</th><td>size</td></tr><tr><th>Description:</th><td width="500">The total size in bytes of the file IO for each thread of this job. If a unit other than bytes is used, the integer is concatenated with the corresponding unit abbreviation (i.e. 10KiB, 10MiB, 10GiB, ...).</td></tr><tr><th>Required:</th><td>Yes</td></tr><tr><th>Type:</th><td><code>string</code></td><tr><th>Minimum length:</th><td>2</td></tr></tbody></table>
+        <table><tbody><tr><th>Name:</th><td>size</td></tr><tr><th>Description:</th><td width="500">The total size of file I/O for each thread of this job. Fio will run until this many bytes has been transferred, unless runtime is altered by other means such as (1) runtime, (2) io_size, (3) number_ios, (4) gaps/holes while doing I/O&#39;s such as `rw=read:16K&#39;, or (5) sequential I/O reaching end of the file which is possible when percentage_random is less than 100. Fio will divide this size between the available files determined by options such as nrfiles, filename, unless filesize is specified by the job. If the result of division happens to be 0, the size is set to the physical size of the given files or devices if they exist. If this option is not specified, fio will use the full size of the given files or devices. If the files do not exist, size must be given. It is also  possible to give size as a percentage between 1 and 100. If &#39;size=20%&#39; is given, fio will use 20% of the full size of the given files or devices. In ZBD mode, size can be given in units of number of zones using &#39;z&#39;. Can be combined with offset to constrain the start and end range that I/O will be done within.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>string</code></td><tr><th>Minimum length:</th><td>2</td></tr></tbody></table>
+        </details><details><summary>startdelay (<code>string</code>)</summary>
+        <table><tbody><tr><th>Name:</th><td>Job Start Delay</td></tr><tr><th>Description:</th><td width="500">Delay the start of job for the specified amount of time. Can be a single value or a range. When given as a range, each thread will choose a value randomly from within the range. Value is in seconds if a unit is omitted.</td></tr><tr><th>Required:</th><td>No</td></tr><tr><th>Type:</th><td><code>string</code></td></tbody></table>
         </details></td></tr>
 </tbody></table>
         </details></details></td></tr>
