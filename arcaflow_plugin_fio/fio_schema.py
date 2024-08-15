@@ -204,7 +204,7 @@ class FioInput:
         schema.description(
             "Cleanup temporary files created during execution."
         ),
-    ] = True
+    ] = False
 
     def write_jobs_to_file(self, filepath: Path):
         cfg = configparser.ConfigParser()
