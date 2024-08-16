@@ -134,6 +134,29 @@ class JobParams:
             "seconds."
         ),
     ] = None
+    time_based: typing.Annotated[
+        typing.Optional[int],
+        validation.min(0),
+        validation.max(1),
+        schema.name("Time Based"),
+        schema.description(
+            "If set, fio will run for the duration of the runtime specified even if the "
+            "file(s) are completely read or written. It will simply loop over the same "
+            "workload as many times as the runtime allows."
+        ),
+    ] = None
+    stonewall: typing.Annotated[
+        typing.Optional[int],
+        validation.min(0),
+        validation.max(1),
+        schema.name("Stonewall"),
+        schema.description(
+            "Wait for preceding jobs in the job file to exit, before starting this "
+            "one. Can be used to insert serialization points in the job file. A "
+            "stonewall also implies starting a new reporting group, (see "
+            "group_reporting)."
+        ),
+    ] = None
     startdelay: typing.Annotated[
         typing.Optional[str],
         schema.name("Job Start Delay"),
