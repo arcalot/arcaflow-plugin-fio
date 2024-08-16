@@ -92,6 +92,17 @@ class JobParams:
             "applies to subsequent types."
         ),
     ] = None
+    blocksize_range: typing.Annotated[
+        typing.Optional[str],
+        validation.min(2),
+        schema.name("Block Size Range"),
+        schema.description(
+            "A range of block sizes in bytes for I/O units. The issued I/O unit will "
+            "always be a multiple of the minimum size, unless blocksize_unaligned is "
+            "set. Comma-separated ranges may be specified for reads, writes, and trims "
+            "as described in blocksize."
+        ),
+    ] = None
     direct: typing.Annotated[
         typing.Optional[int],
         validation.min(0),
