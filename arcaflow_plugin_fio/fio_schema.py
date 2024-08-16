@@ -95,9 +95,9 @@ class JobParams:
         validation.max(1),
         schema.name("Time Based"),
         schema.description(
-            "If set, fio will run for the duration of the runtime specified even if the "
-            "file(s) are completely read or written. It will simply loop over the same "
-            "workload as many times as the runtime allows."
+            "If set, fio will run for the duration of the runtime specified even if "
+            "the file(s) are completely read or written. It will simply loop over the "
+            "same workload as many times as the runtime allows."
         ),
     ] = None
     startdelay: typing.Annotated[
