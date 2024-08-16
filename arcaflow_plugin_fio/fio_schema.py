@@ -66,7 +66,7 @@ class JobParams:
             "The total size of file I/O for each thread of this job. Fio will run "
             "until this many bytes has been transferred, unless runtime is altered by "
             "other means such as (1) runtime, (2) io_size, (3) number_ios, (4) "
-            "gaps/holes while doing I/O's such as `rw=read:16K', or (5) sequential "
+            "gaps/holes while doing I/O's such as 'rw=read:16K', or (5) sequential "
             "I/O reaching end of the file which is possible when percentage_random is "
             "less than 100. Fio will divide this size between the available files "
             "determined by options such as nrfiles, filename, unless filesize is "
@@ -169,42 +169,74 @@ class JobParams:
     ioengine: typing.Annotated[
         typing.Optional[IoEngine],
         schema.name("IO Engine"),
-        schema.description("Defines how the job issues IO to the file."),
+        schema.description("Defines how the job issues I/O to the file."),
     ] = None
     iodepth: typing.Annotated[
         typing.Optional[int],
         schema.name("IO Depth"),
         schema.description(
-            "number of IO units to keep in flight against the file."
+            "Number of I/O units to keep in flight against the file. Note that "
+            "increasing iodepth beyond 1 will not affect synchronous ioengines (except "
+            "for small degrees when verify_async is in use). Even async engines may "
+            "impose OS restrictions causing the desired depth not to be achieved. This "
+            "may happen on Linux when using libaio and not setting 'direct=1', since "
+            "buffered I/O is not async on that OS. Keep an eye on the I/O depth "
+            "distribution in the fio output to verify that the achieved depth is as "
+            "expected."
         ),
     ] = None
     rate_iops: typing.Annotated[
         typing.Optional[int],
         schema.name("IOPS Cap"),
-        schema.description("maximum allowed rate of IO operations per second"),
+        schema.description(
+            "Cap the bandwidth to this number of IOPS. Basically the same as rate, "
+            "just specified independently of bandwidth. If the job is given a block "
+            "size range instead of a fixed value, the smallest block size is used as "
+            "the metric. Comma-separated values may be specified for reads, writes, "
+            "and trims as described in blocksize."
+        ),
     ] = None
     io_submit_mode: typing.Annotated[
         typing.Optional[IoSubmitMode],
         schema.name("IO Submit Mode"),
-        schema.description("Controls how fio submits IO to the IO engine."),
+        schema.description(
+            "Controls how fio submits the I/O to the I/O engine. The default is "
+            "'inline', which  means that the fio job threads submit and reap I/O "
+            "directly. If set to 'offload', the job threads will offload I/O "
+            "submission to a dedicated pool of I/O threads. This requires  some "
+            "coordination and thus has a bit of extra overhead, especially for lower "
+            "queue depth I/O where it can increase latencies. The benefit is that fio "
+            "can manage submission rates independently of the device completion rates. "
+            "This avoids skewed latency reporting if I/O gets backed up on the device "
+            "side (the coordinated omission problem). Note that this option cannot "
+            "reliably be used with async IO engines."
+        ),
     ] = None
     buffered: typing.Annotated[
         Optional[int],
         validation.min(0),
         validation.max(1),
         schema.name("Buffered"),
-        schema.description("Use buffered IO if True, else use direct IO."),
+        schema.description(
+            "Use buffered I/O. This is the opposite of the direct option."
+        ),
     ] = None
     readwrite: typing.Annotated[
         typing.Optional[IoPattern],
         schema.name("Read/Write"),
-        schema.description("type of IO pattern"),
+        schema.description("Type of IO pattern."),
     ] = None
     rate_process: typing.Annotated[
         typing.Optional[RateProcess],
         schema.name("Rate Process"),
         schema.description(
-            "Controls the distribution of delay between IO submissions."
+            "Controls how fio manages rated I/O submissions. The default is 'linear', "
+            "which submits I/O in a linear fashion with fixed delays between I/Os that "
+            "gets adjusted based on I/O completion rates. If this is set to 'poisson', "
+            "fio will submit I/O based on a more real world random request flow, known "
+            "as the Poisson process "
+            "(https://en.wikipedia.org/wiki/Poisson_point_process). The lambda will be "
+            "10^6 / IOPS for the given workload."
         ),
     ] = None
 
@@ -215,12 +247,12 @@ class FioJob:
         str,
         validation.min(1),
         schema.name("Job Name"),
-        schema.description("The user-defined name of the fio job."),
+        schema.description("User-defined ASCII name of the job."),
     ]
     params: typing.Annotated[
         JobParams,
         schema.name("Fio Job Parameters"),
-        schema.description("Parameters to execute one fio job."),
+        schema.description("Parameters for the fio job."),
     ]
 
 
@@ -229,7 +261,7 @@ class FioInput:
     jobs: typing.Annotated[
         typing.List[FioJob],
         schema.name("Fio Jobs List"),
-        schema.description("List of jobs for fio to run"),
+        schema.description("List of jobs for fio to run."),
     ]
 
     cleanup: typing.Annotated[
