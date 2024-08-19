@@ -76,7 +76,6 @@ size_pattern = re.compile(
     rf"^(?:{size_pattern_string}(?:,{size_pattern_string}){{0,2}})$",
     re.IGNORECASE,
 )
-print(size_pattern)
 
 size_pattern_with_percent_string = rf"{size_pattern_string}|[1-9][0-9]?%|100%"
 size_pattern_with_percent = re.compile(
@@ -304,7 +303,7 @@ class JobParams:
         validation.pattern(size_pattern),
         schema.name("Block Size"),
         schema.description(
-            "Block size in bytes used for I/O units. A single value  applies to reads, "
+            "Block size in bytes used for I/O units. A single value applies to reads, "
             "writes, and trims. Comma-separated values may be specified for reads, "
             "writes, and trims. A value not terminated in a comma applies to "
             "subsequent types. Defaults to 4096."
@@ -385,6 +384,7 @@ class JobParams:
     # I/O depth
     iodepth: typing.Annotated[
         typing.Optional[int],
+        validation.min(1),
         schema.name("IO Depth"),
         schema.description(
             "Number of I/O units to keep in flight against the file. Note that "
@@ -491,7 +491,7 @@ class FioInput:
             for key, value in asdict(job.params).items():
                 if value is not None:
                     if isinstance(value, (bool, int)):
-                        item_value = int(value)
+                        item_value = str(int(value))
                     else:
                         item_value = str(value)
                     cfg[job.name][key] = str(item_value)
