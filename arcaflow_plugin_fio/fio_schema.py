@@ -65,25 +65,27 @@ class IoEngine(str, enum.Enum):
 duration_pattern_string = r"[1-9][0-9]*(?:d|h|m|s|ms|us)?"
 duration_pattern = re.compile(rf"^{duration_pattern_string}$")
 duration_range_pattern = re.compile(
-    rf"^{duration_pattern_string}(?:-{duration_pattern_string})?$")
+    rf"^{duration_pattern_string}(?:-{duration_pattern_string})?$"
+)
 
 size_pattern_string = (
     r"0x[0-9a-fA-F]+|"
     r"\d+(?:k|kb|ki|kib|m|mb|mi|mib|g|gb|gi|gib|t|tb|ti|tib|p|pb|pi|pib)?"
 )
 size_pattern = re.compile(
-    rf"^(?:{size_pattern_string}(?:,{size_pattern_string}){{0,2}})$", re.IGNORECASE
+    rf"^(?:{size_pattern_string}(?:,{size_pattern_string}){{0,2}})$",
+    re.IGNORECASE,
 )
 print(size_pattern)
 
-size_pattern_with_percent_string = (
-    rf"{size_pattern_string}|[1-9][0-9]?%|100%"
-)
+size_pattern_with_percent_string = rf"{size_pattern_string}|[1-9][0-9]?%|100%"
 size_pattern_with_percent = re.compile(
     rf"^(?:{size_pattern_with_percent_string})$", re.IGNORECASE
 )
 
-size_range_pattern_string = rf"(?:{size_pattern_string})-(?:{size_pattern_string})"
+size_range_pattern_string = (
+    rf"(?:{size_pattern_string})-(?:{size_pattern_string})"
+)
 size_range_pattern = re.compile(
     rf"^{size_range_pattern_string}$",
     re.IGNORECASE,
