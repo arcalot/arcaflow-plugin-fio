@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import typing
+import re
 import enum
 import configparser
 from dataclasses import dataclass, field, asdict
@@ -8,6 +9,14 @@ from typing import Optional, Dict
 from pathlib import Path
 
 from arcaflow_plugin_sdk import plugin, schema, validation
+
+
+class KbBase(int, enum.Enum):
+    KB = 1000
+    KIB = 1024
+
+    def __int__(self) -> int:
+        return self.value
 
 
 class IoPattern(str, enum.Enum):
@@ -56,15 +65,58 @@ class IoEngine(str, enum.Enum):
         return self.value in self._sync_io_engines
 
 
+time_pattern = re.compile(r"^\d*[d,h,m,s,ms,us]*$")
+
+size_pattern_string = (
+    r"(?:0x\d+)|"
+    r"(?:\d+(?:k|kb|ki|kib|m|mb|mi|mib|g|gb|gi|gib|t|tb|ti|tib|p|pb|pi|pib)*)"
+)
+size_pattern = re.compile(
+    rf"^{size_pattern_string}(?:,{size_pattern_string}){{0,2}}$", re.IGNORECASE
+)
+
+size_pattern_with_percent_string = (
+    rf"{size_pattern_string}|(?:[1-9][0-9]?%$|^100%)"
+)
+size_pattern_with_percent = re.compile(
+    rf"^{size_pattern_with_percent_string}$", re.IGNORECASE
+)
+
+size_range_pattern = re.compile(
+    rf"^(?:{size_pattern_string})-(?:{size_pattern_string})$",
+    re.IGNORECASE,
+)
+
+size_multi_range_pattern = re.compile(
+    rf"^(?:{size_pattern_string})-(?:{size_pattern_string})"
+    rf"(?:,(?:{size_pattern_string})-(?:{size_pattern_string})){{0,2}}$",
+    re.IGNORECASE,
+)
+
+
 @dataclass
 class JobParams:
+    # Units
+    kb_base: typing.Annotated[
+        typing.Optional[KbBase],
+        schema.name("Units Base"),
+        schema.description(
+            "Select the interpretation of unit prefixes in input parameters. The "
+            "default is 1024 (compatibility mode): Power-of-2 values with SI prefixes "
+            "(e.g., KB) and Power-of-10 values with IEC prefixes (e.g., KiB). When "
+            "setting this to 1000, inputs comply with IEC 80000-13 and the "
+            "International System of Units (SI): Power-of-2 values with IEC prefixes "
+            "(e.g., KiB) and Power-of-10 values with SI prefixes (e.g., KB)"
+        ),
+    ] = None
+
     # Job Description
     loops: typing.Annotated[
         typing.Optional[int],
         schema.name("Number of Job Loops"),
         schema.description(
             "Run the specified number of iterations of this job. Used to repeat the "
-            "same workload a given number of times."
+            "same workload a given number of times. Default is 1."
         ),
     ] = None
     numjobs: typing.Annotated[
@@ -74,19 +126,20 @@ class JobParams:
             "Create the specified number of clones of this job. Each clone of job is "
             "spawned as an independent thread or process. May be used to set up a "
             "larger number of threads/processes doing the same thing. Each thread is "
-            "reported separately."
+            "reported separately. Default is 1."
         ),
     ] = None
 
     # Time related parameters
     runtime: typing.Annotated[
         typing.Optional[str],
+        validation.pattern(time_pattern),
         schema.name("Job Run Time"),
         schema.description(
             "Limit runtime. The test will run until it completes the configured I/O "
             "workload or until it has run for this specified amount of time, whichever "
             "occurs first. When the unit is omitted, the value is interpreted in "
-            "seconds."
+            "seconds. Default behavior is size-based operation."
         ),
     ] = None
     time_based: typing.Annotated[
@@ -95,7 +148,7 @@ class JobParams:
         schema.description(
             "If set, fio will run for the duration of the runtime specified even if "
             "the file(s) are completely read or written. It will simply loop over the "
-            "same workload as many times as the runtime allows."
+            "same workload as many times as the runtime allows. Default is false."
         ),
     ] = None
     startdelay: typing.Annotated[
@@ -104,11 +157,13 @@ class JobParams:
         schema.description(
             "Delay the start of job for the specified amount of time. Can be a single "
             "value or a range. When given as a range, each thread will choose a value "
-            "randomly from within the range. Value is in seconds if a unit is omitted."
+            "randomly from within the range. Value is in seconds if a unit is omitted. "
+            "Default is 0."
         ),
     ] = None
     ramp_time: typing.Annotated[
         typing.Optional[str],
+        validation.pattern(time_pattern),
         schema.name("Job Ramp Time"),
         schema.description(
             "Run the specified workload for this amount of time before logging any "
@@ -116,7 +171,7 @@ class JobParams:
             "results, thus minimizing the runtime required for stable results. Note "
             "that the ramp_time is considered lead in time for a job, thus it will "
             "increase the total runtime if a special timeout or runtime is specified. "
-            "When the unit is omitted, the value is given in seconds."
+            "When the unit is omitted, the value is given in seconds. Default is 0."
         ),
     ] = None
 
@@ -132,7 +187,7 @@ class JobParams:
             "using generated filenames. If specific filename(s) are set fio will use "
             "the first listed directory, and thereby matching the filename semantic "
             "(which generates a file for each clone if not specified, but lets all "
-            "clones use the same file if set)."
+            "clones use the same file if set). Default is the current directory."
         ),
     ] = None
     filename: typing.Annotated[
@@ -159,7 +214,8 @@ class JobParams:
             "Number of files to use for this job. The size of files will be size "
             "divided by this unless explicit size is specified by filesize. Files are "
             "created for each thread separately, and each file will have a file number "
-            "within its name by default, as explained in filename section."
+            "within its name by default, as explained in filename section. Default is "
+            "1."
         ),
     ] = None
     openfiles: typing.Annotated[
@@ -176,7 +232,7 @@ class JobParams:
         schema.name("Create Files on Open"),
         schema.description(
             "Don't pre-create files but allow the job's open() to create a file when "
-            "it's time to do I/O."
+            "it's time to do I/O. Defaults to false."
         ),
     ] = None
     pre_read: typing.Annotated[
@@ -188,7 +244,7 @@ class JobParams:
             "pointless to pre-read and then drop the cache. This will only work for "
             "I/O engines that are seek-able, since they allow you to read the same "
             "data multiple times. Thus it will not work on non-seekable I/O engines "
-            "(e.g. network, splice)."
+            "(e.g. network, splice). Defaults to false."
         ),
     ] = None
     unlink: typing.Annotated[
@@ -196,13 +252,16 @@ class JobParams:
         schema.name("Unlink Files"),
         schema.description(
             "Unlink the job files when done. Not the default, as repeated runs of that "
-            "job would then waste time recreating the file set again and again."
+            "job would then waste time recreating the file set again and again. "
+            "Defaults to false."
         ),
     ] = None
     unlink_each_loop: typing.Annotated[
         typing.Optional[bool],
         schema.name("Unlink Files Each Loop"),
-        schema.description("Unlink job files after each iteration or loop."),
+        schema.description(
+            "Unlink job files after each iteration or loop. Defaults to False."
+        ),
     ] = None
 
     # I/O Type
@@ -227,37 +286,41 @@ class JobParams:
     readwrite: typing.Annotated[
         typing.Optional[IoPattern],
         schema.name("Read/Write"),
-        schema.description("Type of IO pattern."),
+        schema.description(
+            "Type of IO pattern. Defaults to read. For the mixed I/O types, the "
+            "default is to split them 50/50. For certain types of I/O the result may "
+            "still be skewed a bit since the speed may be different."
+        ),
     ] = None
 
     # Block size
     blocksize: typing.Annotated[
         typing.Optional[str],
-        validation.min(2),
+        validation.pattern(size_pattern),
         schema.name("Block Size"),
         schema.description(
-            "Block size in bytes used for I/O units. Default is 4096. A single value "
-            "applies to reads, writes, and trims. Comma-separated values may be "
-            "specified for reads, writes, and trims. A value not terminated in a comma "
-            "applies to subsequent types."
+            "Block size in bytes used for I/O units. A single value  applies to reads, "
+            "writes, and trims. Comma-separated values may be specified for reads, "
+            "writes, and trims. A value not terminated in a comma applies to "
+            "subsequent types. Defaults to 4096."
         ),
     ] = None
     blocksize_range: typing.Annotated[
         typing.Optional[str],
-        validation.min(2),
+        validation.pattern(size_multi_range_pattern),
         schema.name("Block Size Range"),
         schema.description(
             "A range of block sizes in bytes for I/O units. The issued I/O unit will "
             "always be a multiple of the minimum size, unless blocksize_unaligned is "
             "set. Comma-separated ranges may be specified for reads, writes, and trims "
-            "as described in blocksize."
+            "as described in blocksize. A range is not used by default."
         ),
     ] = None
 
     # I/O  size
     size: typing.Annotated[
         typing.Optional[str],
-        validation.min(2),
+        validation.pattern(size_pattern_with_percent),
         schema.name("Total I/O Size"),
         schema.description(
             "The total size of file I/O for each thread of this job. Fio will run "
@@ -273,14 +336,12 @@ class JobParams:
             "files or devices. If the files do not exist, size must be given. It is "
             "also  possible to give size as a percentage between 1 and 100. If "
             "'size=20%' is given, fio will use 20% of the full size of the given files "
-            "or devices. In ZBD mode, size can be given in units of number of zones "
-            "using 'z'. Can be combined with offset to constrain the start and end "
-            "range that I/O will be done within."
+            "or devices."
         ),
     ] = None
     io_size: typing.Annotated[
         typing.Optional[str],
-        validation.min(2),
+        validation.pattern(size_pattern_with_percent),
         schema.name("I/O Size"),
         schema.description(
             "Normally fio operates within the region set by size, which means that the "
@@ -296,7 +357,7 @@ class JobParams:
     ] = None
     filesize: typing.Annotated[
         typing.Optional[str],
-        validation.min(2),
+        validation.pattern(size_range_pattern),
         schema.name("File Size"),
         schema.description(
             "Individual file sizes. May be a range, in which case fio will select "
@@ -311,7 +372,9 @@ class JobParams:
     ioengine: typing.Annotated[
         typing.Optional[IoEngine],
         schema.name("IO Engine"),
-        schema.description("Defines how the job issues I/O to the file."),
+        schema.description(
+            "Defines how the job issues I/O to the file. Default is sync."
+        ),
     ] = None
 
     # I/O depth
@@ -326,7 +389,7 @@ class JobParams:
             "may happen on Linux when using libaio and not setting 'direct=1', since "
             "buffered I/O is not async on that OS. Keep an eye on the I/O depth "
             "distribution in the fio output to verify that the achieved depth is as "
-            "expected."
+            "expected. Default is 1."
         ),
     ] = None
     io_submit_mode: typing.Annotated[
@@ -348,7 +411,8 @@ class JobParams:
 
     # I/O rate
     rate_iops: typing.Annotated[
-        typing.Optional[int],
+        typing.Optional[str],
+        validation.pattern(size_pattern),
         schema.name("IOPS Cap"),
         schema.description(
             "Cap the bandwidth to this number of IOPS. Basically the same as rate, "
@@ -380,7 +444,7 @@ class JobParams:
             "Wait for preceding jobs in the job file to exit, before starting this "
             "one. Can be used to insert serialization points in the job file. A "
             "stonewall also implies starting a new reporting group, (see "
-            "group_reporting)."
+            "group_reporting). Default is false."
         ),
     ] = None
 
