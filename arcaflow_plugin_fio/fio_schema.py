@@ -11,12 +11,9 @@ from pathlib import Path
 from arcaflow_plugin_sdk import plugin, schema, validation
 
 
-class KbBase(int, enum.Enum):
+class KbBase(enum.IntEnum):
     KB = 1000
     KIB = 1024
-
-    def __int__(self) -> int:
-        return self.value
 
 
 class IoPattern(str, enum.Enum):
@@ -65,31 +62,33 @@ class IoEngine(str, enum.Enum):
         return self.value in self._sync_io_engines
 
 
-time_pattern = re.compile(r"^\d*[d,h,m,s,ms,us]*$")
+duration_pattern = re.compile(r"^[1-9][0-9]*(?:d|h|m|s|ms|us)?$")
 
 size_pattern_string = (
-    r"(?:0x\d+)|"
-    r"(?:\d+(?:k|kb|ki|kib|m|mb|mi|mib|g|gb|gi|gib|t|tb|ti|tib|p|pb|pi|pib)*)"
+    r"0x[0-9a-fA-F]+|"
+    r"\d+(?:k|kb|ki|kib|m|mb|mi|mib|g|gb|gi|gib|t|tb|ti|tib|p|pb|pi|pib)?"
 )
 size_pattern = re.compile(
-    rf"^{size_pattern_string}(?:,{size_pattern_string}){{0,2}}$", re.IGNORECASE
+    rf"^(?:{size_pattern_string}(?:,{size_pattern_string}){{0,2}})$", re.IGNORECASE
 )
+print(size_pattern)
 
 size_pattern_with_percent_string = (
-    rf"{size_pattern_string}|(?:[1-9][0-9]?%$|^100%)"
+    rf"{size_pattern_string}|[1-9][0-9]?%|100%"
 )
 size_pattern_with_percent = re.compile(
-    rf"^{size_pattern_with_percent_string}$", re.IGNORECASE
+    rf"^(?:{size_pattern_with_percent_string})$", re.IGNORECASE
 )
 
+size_range_pattern_string = rf"(?:{size_pattern_string})-(?:{size_pattern_string})"
 size_range_pattern = re.compile(
-    rf"^(?:{size_pattern_string})-(?:{size_pattern_string})$",
+    rf"^{size_range_pattern_string}$",
     re.IGNORECASE,
 )
 
 size_multi_range_pattern = re.compile(
-    rf"^(?:{size_pattern_string})-(?:{size_pattern_string})"
-    rf"(?:,(?:{size_pattern_string})-(?:{size_pattern_string})){{0,2}}$",
+    rf"^{size_range_pattern_string}"
+    rf"(?:,{size_range_pattern_string}){{0,2}}$",
     re.IGNORECASE,
 )
 
@@ -133,7 +132,7 @@ class JobParams:
     # Time related parameters
     runtime: typing.Annotated[
         typing.Optional[str],
-        validation.pattern(time_pattern),
+        validation.pattern(duration_pattern),
         schema.name("Job Run Time"),
         schema.description(
             "Limit runtime. The test will run until it completes the configured I/O "
@@ -163,7 +162,7 @@ class JobParams:
     ] = None
     ramp_time: typing.Annotated[
         typing.Optional[str],
-        validation.pattern(time_pattern),
+        validation.pattern(duration_pattern),
         schema.name("Job Ramp Time"),
         schema.description(
             "Run the specified workload for this amount of time before logging any "
