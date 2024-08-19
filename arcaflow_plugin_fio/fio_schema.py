@@ -62,7 +62,10 @@ class IoEngine(str, enum.Enum):
         return self.value in self._sync_io_engines
 
 
-duration_pattern = re.compile(r"^[1-9][0-9]*(?:d|h|m|s|ms|us)?$")
+duration_pattern_string = r"[1-9][0-9]*(?:d|h|m|s|ms|us)?"
+duration_pattern = re.compile(rf"^{duration_pattern_string}$")
+duration_range_pattern = re.compile(
+    rf"^{duration_pattern_string}(?:-{duration_pattern_string})?$")
 
 size_pattern_string = (
     r"0x[0-9a-fA-F]+|"
@@ -152,6 +155,7 @@ class JobParams:
     ] = None
     startdelay: typing.Annotated[
         typing.Optional[str],
+        validation.pattern(duration_range_pattern),
         schema.name("Job Start Delay"),
         schema.description(
             "Delay the start of job for the specified amount of time. Can be a single "
