@@ -10,7 +10,10 @@ with a given input schema defined in a yaml file.
 
 ## Input structure
 
-The input structure (YAML or JSON) is a near-match to a standard fio job file. A list of `jobs` is provide, with each item requiring a `name`, which is equivalent to a fio job file section name, and a `params` object with key-value pairs that match job parameters from an fio job file.
+The input structure (YAML or JSON) is a near-match to a standard fio job file. A list of
+`jobs` is provided, with each item requiring a `name`, which is equivalent to a fio job
+file section name, and a `params` object with key-value pairs that match job parameters
+from an fio job file.
 
 For example, a fio job file like this:
 

@@ -72,7 +72,7 @@ class JobParams:
         schema.name("Number of Job Clones"),
         schema.description(
             "Create the specified number of clones of this job. Each clone of job is "
-            "spawned as an independent thread or process. May be used to setup a "
+            "spawned as an independent thread or process. May be used to set up a "
             "larger number of threads/processes doing the same thing. Each thread is "
             "reported separately."
         ),
@@ -90,9 +90,7 @@ class JobParams:
         ),
     ] = None
     time_based: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Time Based"),
         schema.description(
             "If set, fio will run for the duration of the runtime specified even if "
@@ -139,7 +137,7 @@ class JobParams:
     ] = None
     filename: typing.Annotated[
         typing.Optional[str],
-        schema.name("Job Directory"),
+        schema.name("File Name"),
         schema.description(
             "Fio normally makes up a filename based on the job name, thread number, "
             "and file number. If you want to share files between threads in a job or "
@@ -174,9 +172,7 @@ class JobParams:
         ),
     ] = None
     create_on_open: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Create Files on Open"),
         schema.description(
             "Don't pre-create files but allow the job's open() to create a file when "
@@ -184,9 +180,7 @@ class JobParams:
         ),
     ] = None
     pre_read: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Pre-Read Files"),
         schema.description(
             "Files will be pre-read into memory before starting the given I/O "
@@ -198,9 +192,7 @@ class JobParams:
         ),
     ] = None
     unlink: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Unlink Files"),
         schema.description(
             "Unlink the job files when done. Not the default, as repeated runs of that "
@@ -208,32 +200,28 @@ class JobParams:
         ),
     ] = None
     unlink_each_loop: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Unlink Files Each Loop"),
         schema.description("Unlink job files after each iteration or loop."),
     ] = None
 
     # I/O Type
     direct: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Direct I/O"),
         schema.description(
             "Use non-buffered I/O. This is usually O_DIRECT. Note that OpenBSD and ZFS "
             "on Solaris don't support direct I/O. On Windows the synchronous ioengines "
-            "don't support direct I/O."
+            "don't support direct I/O. This is the opposite of the buffered option and "
+            "defaults to False."
         ),
     ] = None
     buffered: typing.Annotated[
-        Optional[int],
-        validation.min(0),
-        validation.max(1),
+        Optional[bool],
         schema.name("Buffered"),
         schema.description(
-            "Use buffered I/O. This is the opposite of the direct option."
+            "Use buffered I/O. This is the opposite of the direct option and defaults "
+            "to True."
         ),
     ] = None
     readwrite: typing.Annotated[
@@ -270,15 +258,15 @@ class JobParams:
     size: typing.Annotated[
         typing.Optional[str],
         validation.min(2),
-        schema.name("size"),
+        schema.name("Total I/O Size"),
         schema.description(
             "The total size of file I/O for each thread of this job. Fio will run "
-            "until this many bytes has been transferred, unless runtime is altered by "
+            "until this many bytes have been transferred, unless runtime is altered by "
             "other means such as (1) runtime, (2) io_size, (3) number_ios, (4) "
             "gaps/holes while doing I/O's such as 'rw=read:16K', or (5) sequential "
             "I/O reaching end of the file which is possible when percentage_random is "
             "less than 100. Fio will divide this size between the available files "
-            "determined by options such as nrfiles, filename, unless filesize is "
+            "determined by options such as nrfiles or filename, unless filesize is "
             "specified by the job. If the result of division happens to be 0, the size "
             "is set to the physical size of the given files or devices if they exist. "
             "If this option is not specified, fio will use the full size of the given "
@@ -288,6 +276,34 @@ class JobParams:
             "or devices. In ZBD mode, size can be given in units of number of zones "
             "using 'z'. Can be combined with offset to constrain the start and end "
             "range that I/O will be done within."
+        ),
+    ] = None
+    io_size: typing.Annotated[
+        typing.Optional[str],
+        validation.min(2),
+        schema.name("I/O Size"),
+        schema.description(
+            "Normally fio operates within the region set by size, which means that the "
+            "size option sets both the region and size of I/O to be performed. "
+            "Sometimes that is not what you want. With this option, it is possible to "
+            "define just the amount of I/O that fio should do. For instance, if size "
+            "is set to 20GiB and io_size is set to 5GiB, fio will perform I/O within "
+            "the first 20GiB but exit when 5GiB have been done. The opposite is also "
+            "possible -- if size is set to 20GiB, and io_size is set to 40GiB, then "
+            "fio will do 40GiB of I/O within the 0..20GiB region. Value can be set as "
+            "percentage: io_size=N%. In this case io_size multiplies size= value."
+        ),
+    ] = None
+    filesize: typing.Annotated[
+        typing.Optional[str],
+        validation.min(2),
+        schema.name("File Size"),
+        schema.description(
+            "Individual file sizes. May be a range, in which case fio will select "
+            "sizes for files at random within the given range. If not given, each "
+            "created file is the same size. This option overrides size in terms of "
+            "file size, i.e. size becomes merely the default for io_size (and has no "
+            "effect at all if io_size is set explicitly)."
         ),
     ] = None
 
@@ -320,7 +336,7 @@ class JobParams:
             "Controls how fio submits the I/O to the I/O engine. The default is "
             "'inline', which  means that the fio job threads submit and reap I/O "
             "directly. If set to 'offload', the job threads will offload I/O "
-            "submission to a dedicated pool of I/O threads. This requires  some "
+            "submission to a dedicated pool of I/O threads. This requires some "
             "coordination and thus has a bit of extra overhead, especially for lower "
             "queue depth I/O where it can increase latencies. The benefit is that fio "
             "can manage submission rates independently of the device completion rates. "
@@ -358,9 +374,7 @@ class JobParams:
 
     # Threads, processes, and job synchronization
     stonewall: typing.Annotated[
-        typing.Optional[int],
-        validation.min(0),
-        validation.max(1),
+        typing.Optional[bool],
         schema.name("Stonewall"),
         schema.description(
             "Wait for preceding jobs in the job file to exit, before starting this "
@@ -375,7 +389,6 @@ class JobParams:
 class FioJob:
     name: typing.Annotated[
         str,
-        validation.min(1),
         schema.name("Job Name"),
         schema.description("User-defined ASCII name of the job."),
     ]
@@ -408,7 +421,11 @@ class FioInput:
             cfg[job.name] = {}
             for key, value in asdict(job.params).items():
                 if value is not None:
-                    cfg[job.name][key] = str(value)
+                    if isinstance(value, (bool, int)):
+                        item_value = int(value)
+                    else:
+                        item_value = str(value)
+                    cfg[job.name][key] = str(item_value)
         with open(filepath, "w") as temp:
             cfg.write(
                 temp,
