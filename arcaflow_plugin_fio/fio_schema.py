@@ -96,6 +96,8 @@ size_multi_range_pattern = re.compile(
     re.IGNORECASE,
 )
 
+path_pattern = re.compile(r"^[^:]+(?::[^:]+)*$")
+
 
 @dataclass
 class JobParams:
@@ -182,6 +184,7 @@ class JobParams:
     # Target file/device
     directory: typing.Annotated[
         typing.Optional[str],
+        validation.pattern(path_pattern),
         schema.name("Job Directory"),
         schema.description(
             "Prefix filenames with this directory. Used to place files in a different "
@@ -196,6 +199,7 @@ class JobParams:
     ] = None
     filename: typing.Annotated[
         typing.Optional[str],
+        validation.pattern(path_pattern),
         schema.name("File Name"),
         schema.description(
             "Fio normally makes up a filename based on the job name, thread number, "
