@@ -489,7 +489,7 @@ class FioInput:
     ] = False
 
     def write_jobs_to_file(self, filepath: Path):
-        cfg = configparser.ConfigParser()
+        cfg = configparser.ConfigParser(interpolation=None)
         for job in self.jobs:
             cfg[job.name] = {}
             for key, value in asdict(job.params).items():
