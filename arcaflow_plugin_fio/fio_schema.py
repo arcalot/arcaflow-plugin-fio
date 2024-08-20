@@ -73,7 +73,7 @@ size_pattern_string = (
     r"\d+(?:k|kb|ki|kib|m|mb|mi|mib|g|gb|gi|gib|t|tb|ti|tib|p|pb|pi|pib)?"
 )
 size_pattern = re.compile(
-    rf"^(?:{size_pattern_string}(?:,{size_pattern_string}){{0,2}})$",
+    rf"^(?:{size_pattern_string})(?:,(?:{size_pattern_string})){{0,2}}$",
     re.IGNORECASE,
 )
 
@@ -144,7 +144,7 @@ class JobParams:
             "Limit runtime. The test will run until it completes the configured I/O "
             "workload or until it has run for this specified amount of time, whichever "
             "occurs first. When the unit is omitted, the value is interpreted in "
-            "seconds. Default behavior is size-based operation."
+            "seconds. Default is no time limit."
         ),
     ] = None
     time_based: typing.Annotated[
@@ -342,7 +342,7 @@ class JobParams:
             "is set to the physical size of the given files or devices if they exist. "
             "If this option is not specified, fio will use the full size of the given "
             "files or devices. If the files do not exist, size must be given. It is "
-            "also  possible to give size as a percentage between 1 and 100. If "
+            "also possible to give size as a percentage between 1 and 100. If "
             "'size=20%' is given, fio will use 20% of the full size of the given files "
             "or devices."
         ),
@@ -360,7 +360,7 @@ class JobParams:
             "the first 20GiB but exit when 5GiB have been done. The opposite is also "
             "possible -- if size is set to 20GiB, and io_size is set to 40GiB, then "
             "fio will do 40GiB of I/O within the 0..20GiB region. Value can be set as "
-            "percentage: io_size=N%. In this case io_size multiplies size= value."
+            "percentage: io_size=N%. In this case io_size multiplies 'size' value."
         ),
     ] = None
     filesize: typing.Annotated[
