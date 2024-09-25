@@ -48,8 +48,6 @@ class IoSubmitMode(str, enum.Enum):
 
 
 class IoEngine(str, enum.Enum):
-    _sync_io_engines = {"sync", "psync"}
-    _async_io_engines = {"libaio", "windowsaio"}
     sync = "sync"
     psync = "psync"
     libaio = "libaio"
@@ -57,9 +55,6 @@ class IoEngine(str, enum.Enum):
 
     def __str__(self) -> str:
         return self.value
-
-    def is_sync(self) -> bool:
-        return self.value in self._sync_io_engines
 
 
 duration_pattern_string = r"[1-9][0-9]*(?:d|h|m|s|ms|us)?"
