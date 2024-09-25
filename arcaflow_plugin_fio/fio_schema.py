@@ -57,7 +57,7 @@ class IoEngine(str, enum.Enum):
         return self.value
 
 
-duration_pattern_string = r"[1-9][0-9]*(?:d|h|m|s|ms|us)?"
+duration_pattern_string = r"[0-9]+(?:d|h|m|s|ms|us)?"
 duration_pattern = re.compile(rf"^{duration_pattern_string}$")
 duration_range_pattern = re.compile(
     rf"^{duration_pattern_string}(?:-{duration_pattern_string})?$"
