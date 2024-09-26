@@ -101,12 +101,14 @@ class JobParams:
         typing.Optional[KbBase],
         schema.name("Units Base"),
         schema.description(
-            "Select the interpretation of unit prefixes in input parameters. The "
-            "default is 1024 (compatibility mode): Power-of-2 values with SI prefixes "
-            "(e.g., KB) and Power-of-10 values with IEC prefixes (e.g., KiB). When "
-            "setting this to 1000, inputs comply with IEC 80000-13 and the "
-            "International System of Units (SI): Power-of-2 values with IEC prefixes "
-            "(e.g., KiB) and Power-of-10 values with SI prefixes (e.g., KB)"
+            "Select the interpretation of unit prefixes in input parameters. "
+            "Specifying '1000' indicates that the inputs comply with IEC 80000-13 and "
+            "the International System of Units (SI), that is units with IEC prefixes "
+            "(e.g., KiB) use power-of-2 multipliers and units with SI prefixes (e.g., "
+            "KB) use power-of-10 multipliers. Specifying '1024' indicates the reverse, "
+            "that units with SI prefixes (e.g., KB) use power-of-2 multipliers and "
+            "values with IEC prefixes (e.g., KiB) use power-of-10 multipliers. The "
+            "default is '1024'."
         ),
     ] = None
 
@@ -302,9 +304,9 @@ class JobParams:
         validation.pattern(size_pattern),
         schema.name("Block Size"),
         schema.description(
-            "Block size in bytes used for I/O units. A single value applies to reads, "
-            "writes, and trims. Comma-separated values may be specified for reads, "
-            "writes, and trims. A value not terminated in a comma applies to "
+            "Block size in bytes used for I/O operations. A single value applies to "
+            "reads, writes, and trims. Comma-separated values may be specified for "
+            "reads, writes, and trims. A value not terminated in a comma applies to "
             "subsequent types. Defaults to 4096."
         ),
     ] = None
@@ -313,10 +315,11 @@ class JobParams:
         validation.pattern(size_multi_range_pattern),
         schema.name("Block Size Range"),
         schema.description(
-            "A range of block sizes in bytes for I/O units. The issued I/O unit will "
-            "always be a multiple of the minimum size, unless blocksize_unaligned is "
-            "set. Comma-separated ranges may be specified for reads, writes, and trims "
-            "as described in blocksize. A range is not used by default."
+            "A range of block sizes in bytes for I/O operations. The issued I/O "
+            "operation will always be a multiple of the minimum size, unless "
+            "blocksize_unaligned is set. Comma-separated ranges may be specified for "
+            "reads, writes, and trims as described in blocksize. A range is not used "
+            "by default."
         ),
     ] = None
 
@@ -386,7 +389,7 @@ class JobParams:
         validation.min(1),
         schema.name("IO Depth"),
         schema.description(
-            "Number of I/O units to keep in flight against the file. Note that "
+            "Number of I/O operations to keep in flight against the file. Note that "
             "increasing iodepth beyond 1 will not affect synchronous ioengines (except "
             "for small degrees when verify_async is in use). Even async engines may "
             "impose OS restrictions causing the desired depth not to be achieved. This "
