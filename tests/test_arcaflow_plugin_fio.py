@@ -36,11 +36,13 @@ class FioPluginTest(unittest.TestCase):
         )
 
     def test_functional_success(self):
-        job = fio_schema.fio_input_schema.unserialize(
+        input = fio_schema.fio_input_schema.unserialize(
             yaml.safe_load(poisson_submit_infile)
         )
-        job.cleanup = False
-        output_id, output_data = fio_plugin.run(params=job, run_id="plugin_ci")
+        input.cleanup = False
+        output_id, output_data = fio_plugin.run(
+            params=input, run_id="plugin_ci"
+        )
 
         # if the command didn't succeed, fio-plus.json won't exist.
         try:
@@ -61,7 +63,7 @@ class FioPluginTest(unittest.TestCase):
 
         Path("fio-plus.json").unlink(missing_ok=True)
         Path("fio-input-tmp.fio").unlink(missing_ok=True)
-        Path(job.name + ".0.0").unlink(missing_ok=True)
+        Path(input.jobs[0].name + ".0.0").unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
