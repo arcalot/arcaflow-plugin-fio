@@ -297,6 +297,34 @@ class JobParams:
             "still be skewed a bit since the speed may be different."
         ),
     ] = None
+    rwmixread: typing.Annotated[
+        typing.Optional[int],
+        validation.min(1),
+        validation.max(100),
+        schema.name("Read/Write Mix - Read"),
+        schema.description(
+            "Percentage of a mixed workload that should be reads. If both rwmixread "
+            "and rwmixwrite is given and the values do not add up to 100%, the latter "
+            "of the two will be used to override the first. This may interfere with a "
+            "given rate setting, if fio is asked to limit reads or writes to a certain "
+            "rate. If that is the case, then the distribution may be skewed. Default: "
+            "50."
+        ),
+    ] = None
+    rwmixwrite: typing.Annotated[
+        typing.Optional[int],
+        validation.min(1),
+        validation.max(100),
+        schema.name("Read/Write Mix - Write"),
+        schema.description(
+            "Percentage of a mixed workload that should be writes. If both rwmixread "
+            "and rwmixwrite is given and the values do not add up to 100%, the latter "
+            "of the two will be used to override the first. This may interfere with a "
+            "given rate setting, if fio is asked to limit reads or writes to a certain "
+            "rate. If that is the case, then the distribution may be skewed. Default: "
+            "50."
+        ),
+    ] = None
 
     # Block size
     blocksize: typing.Annotated[
