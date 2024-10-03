@@ -297,6 +297,30 @@ class JobParams:
             "still be skewed a bit since the speed may be different."
         ),
     ] = None
+    rwmixread: typing.Annotated[
+        typing.Optional[int],
+        validation.min(1),
+        validation.max(100),
+        schema.name("Read/Write Mix - Read"),
+        schema.conflicts("rwmixwrite"),
+        schema.description(
+            "Percentage of a mixed workload that should be reads. Only one of "
+            "either rwmixread or rwmixwrite is allowed in an individual job "
+            "definition. Default: 50"
+        ),
+    ] = None
+    rwmixwrite: typing.Annotated[
+        typing.Optional[int],
+        validation.min(1),
+        validation.max(100),
+        schema.name("Read/Write Mix - Write"),
+        schema.conflicts("rwmixread"),
+        schema.description(
+            "Percentage of a mixed workload that should be writes. Only one of "
+            "either rwmixread or rwmixwrite is allowed in an individual job "
+            "definition. Default: 50"
+        ),
+    ] = None
 
     # Block size
     blocksize: typing.Annotated[
