@@ -479,6 +479,21 @@ class JobParams:
         ),
     ] = None
 
+    # Measurements and reporting
+    group_reporting: typing.Annotated[
+        typing.Optional[bool],
+        schema.name("Stonewall"),
+        schema.description(
+            "It may sometimes be interesting to display statistics for groups of jobs "
+            "as a whole instead of for each individual job. This is especially true if "
+            "numjobs is used, as looking at individual thread/process output quickly "
+            "becomes unwieldy. To generate the final report per-group instead of "
+            "per-job, use 'group_reporting'. Jobs in a file will be part of the same "
+            "reporting group, unless separated by use of the 'stonewall' parameter. "
+            "Default is false."
+        ),
+    ] = None
+
 
 @dataclass
 class FioJob:
