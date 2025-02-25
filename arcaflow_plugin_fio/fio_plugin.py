@@ -36,7 +36,11 @@ def run(
             "--output-format=json+",
             f"--output={outfile_temp_path}",
         ]
-        subprocess.check_output(cmd)
+        subprocess.check_output(
+            cmd,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
         output: FioSuccessOutput = fio_output_schema.unserialize(
             json.loads(outfile_temp_path.read_text())
         )
