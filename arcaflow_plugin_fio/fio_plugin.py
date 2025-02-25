@@ -52,7 +52,7 @@ def run(
             error_output: FioErrorOutput = FioErrorOutput(format_exc())
         return "error", error_output
 
-    except Exception:
+    except subprocess.CalledProcessError:
         error_output: FioErrorOutput = FioErrorOutput(format_exc())
         return "error", error_output
 
