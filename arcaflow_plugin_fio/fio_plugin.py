@@ -52,9 +52,10 @@ def run(
             error_output: FioErrorOutput = FioErrorOutput(format_exc())
         return "error", error_output
 
-    except subprocess.CalledProcessError:
-        error_output: FioErrorOutput = FioErrorOutput(format_exc())
-        return "error", error_output
+    except subprocess.CalledProcessError as err:
+        return "error", FioErrorOutput(
+            f"{err.cmd[0]} failed with return code {err.returncode}:\n{err.output}"
+        )
 
     finally:
         if params.cleanup:
