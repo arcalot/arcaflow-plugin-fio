@@ -31,7 +31,7 @@ def split_json_and_errors(fio_output: str):
             error_data += f"{lines[i]}\n"
             continue
 
-    return json_data, str(error_data)
+    return json_data, error_data
 
 
 @plugin.step(
