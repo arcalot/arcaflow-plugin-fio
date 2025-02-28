@@ -19,7 +19,12 @@ from fio_schema import (
 
 def split_json_and_errors(fio_output: str):
     # Sometimes fio informational messages are included at the top of the JSON output.
-    # Separate the json data from the errors and return them as a tuple.
+    # This is a known issue for fio: https://github.com/axboe/fio/issues/731
+    #
+    # Here we separate the json data from the errors and return them as a tuple. This
+    # function is based on a workaround used by fio in one of their tests:
+    # https://github.com/axboe/fio/blob/fio-3.17/t/run-fio-tests.py#L281
+    json_data = {}
     error_data = ""
     lines = fio_output.splitlines()
     for i in range(len(fio_output)):
