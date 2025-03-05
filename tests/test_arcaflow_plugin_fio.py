@@ -44,24 +44,21 @@ class FioPluginTest(unittest.TestCase):
             params=input, run_id="plugin_ci"
         )
 
-        # if the command didn't succeed, fio-plus.json won't exist.
         try:
-            self.assertEqual("success", output_id)
+            self.assertEqual(output_id, "success")
+            self.assertEqual(
+                output_data.jobs[0].jobname, "poisson-rate-submit"
+            )
+            self.assertEqual(output_data.jobs[0].job_options["iodepth"], "32")
+            self.assertEqual(output_data.jobs[0].job_options["size"], "100KiB")
+            self.assertAlmostEqual(output_data.jobs[0].elapsed, 2, delta=1)
+            self.assertAlmostEqual(
+                output_data.jobs[0].read.runtime, 2000, delta=10
+            )
         except AssertionError:
             sys.stderr.write("Error: {}\n".format(output_data.error))
             raise
 
-        with open("fio-plus.json", "r") as fio_output_file:
-            fio_results = fio_output_file.read()
-            output_actual: fio_plugin.FioSuccessOutput = (
-                fio_schema.fio_output_schema.unserialize(
-                    json.loads(fio_results)
-                )
-            )
-
-        self.assertEqual(output_data, output_actual)
-
-        Path("fio-plus.json").unlink(missing_ok=True)
         Path("fio-input-tmp.fio").unlink(missing_ok=True)
         Path(input.jobs[0].name + ".0.0").unlink(missing_ok=True)
 

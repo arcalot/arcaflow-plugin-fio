@@ -11,3 +11,5 @@ jobs:
       rate_iops: 50
       rate_process: poisson
       buffered: 0
+      runtime: 2
+      time_based: 1

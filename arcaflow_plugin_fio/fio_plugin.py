@@ -17,6 +17,28 @@ from fio_schema import (
 )
 
 
+def split_json_and_errors(fio_output: str):
+    # Sometimes fio informational messages are included at the top of the JSON output.
+    # This is a known issue for fio: https://github.com/axboe/fio/issues/731
+    #
+    # Here we separate the json data from the errors and return them as a tuple. This
+    # function is based on a workaround used by fio in one of their tests:
+    # https://github.com/axboe/fio/blob/fio-3.17/t/run-fio-tests.py#L281
+    json_data = {}
+    error_data = ""
+    lines = fio_output.splitlines()
+    for i in range(len(fio_output)):
+        file_data = "\n".join(lines[i:])
+        try:
+            json_data = json.loads(file_data)
+            break
+        except json.JSONDecodeError:
+            error_data += f"{lines[i]}\n"
+            continue
+
+    return json_data, error_data
+
+
 @plugin.step(
     id="workload",
     name="fio workload",
@@ -27,19 +49,28 @@ def run(
     params: FioInput,
 ) -> typing.Tuple[str, Union[FioSuccessOutput, FioErrorOutput]]:
     try:
-        outfile_temp_path = Path("fio-plus.json")
         infile_temp_path = Path("fio-input-tmp.fio")
         params.write_jobs_to_file(infile_temp_path)
         cmd = [
             "fio",
-            f"{infile_temp_path}",
+            infile_temp_path,
             "--output-format=json+",
-            f"--output={outfile_temp_path}",
         ]
-        subprocess.check_output(cmd)
-        output: FioSuccessOutput = fio_output_schema.unserialize(
-            json.loads(outfile_temp_path.read_text())
+
+        cmd_out = subprocess.check_output(
+            args=cmd,
+            stderr=subprocess.STDOUT,
+            text=True,
         )
+
+        json_data, error_data = split_json_and_errors(cmd_out)
+
+        # It is possible for fio to complete successfully but still return some
+        # informational messages. If we have any, raise them for debug output.
+        if error_data:
+            print(f"fio messages:\n{error_data}")
+
+        output: FioSuccessOutput = fio_output_schema.unserialize(json_data)
 
         return "success", output
 
@@ -52,14 +83,16 @@ def run(
             error_output: FioErrorOutput = FioErrorOutput(format_exc())
         return "error", error_output
 
-    except Exception:
-        error_output: FioErrorOutput = FioErrorOutput(format_exc())
-        return "error", error_output
+    except subprocess.CalledProcessError as err:
+        # Get the error messages only from the output
+        _, error_data = split_json_and_errors(err.output)
+        return "error", FioErrorOutput(
+            f"{err.cmd[0]} failed with return code {err.returncode}:\n{error_data}"
+        )
 
     finally:
         if params.cleanup:
             infile_temp_path.unlink(missing_ok=True)
-            outfile_temp_path.unlink(missing_ok=True)
             for job in params.jobs:
                 Path(job.name + ".0.0").unlink(missing_ok=True)
 
