@@ -4,7 +4,7 @@ ARG package=arcaflow_plugin_fio
 # STAGE 1 -- Build module dependencies and run tests
 # The 'poetry' and 'coverage' modules are installed and verson-controlled in the
 # quay.io/arcalot/arcaflow-plugin-baseimage-python-buildbase image to limit drift
-FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-buildbase:0.4.2 as build
+FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-buildbase:0.5.0 as build
 RUN dnf -y install fio-3.35-1.el9
 ARG package
 
@@ -28,7 +28,7 @@ RUN python -m coverage run tests/test_${package}.py \
 
 
 # STAGE 2 -- Build final plugin image
-FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-osbase:0.4.2
+FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-osbase:0.5.0
 RUN dnf -y install fio-3.35-1.el9
 ARG package
 
